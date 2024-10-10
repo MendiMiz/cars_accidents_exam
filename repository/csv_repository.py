@@ -56,7 +56,7 @@ def init_car_accidents():
            )
 
            monthly_statistics.update_one(
-               {'month': get_week_start(row['CRASH_DATE']), 'year': extract_year(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
+               {'month': row['CRASH_MONTH'], 'year': extract_year(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
                {'$inc': {
                    'total_accidents': 1,
                    'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
@@ -71,4 +71,4 @@ def init_car_accidents():
        return  "failed to initialize db"
 
 
-# init_car_accidents()
+init_car_accidents()
