@@ -109,10 +109,32 @@ def get_injuries_and_fatal_by_area(area, accidents = all_accidents):
 
     return res
 
-print(get_incident_by_reason_in_area('225'))
-# print(get_injuries_and_fatal_by_area('225'))
-print(count_by_area_and_day('225', '2023-09-05'))
-print(count_by_area_and_week('411', '2023-09-19'))
-print(count_by_area_year_month('1650', 2023, '8'))
+# print(get_incident_by_reason_in_area('225'))
+# # print(get_injuries_and_fatal_by_area('225'))
+# print(count_by_area_and_day('225', '2023-09-05'))
+# print(count_by_area_and_week('411', '2023-09-19'))
+# print(count_by_area_year_month('1650', 2023, '8'))
+
+
+
+
+# השאילתןת שלי רצות כולם לפי איזור ולכן בחרתי להוסיף לו אינדקס
+
+all_accidents.drop_indexes()
+all_accidents.create_index({ 'area': 1 })
+executionStats = (all_accidents
+      .find({ 'area': '225' })
+      .hint({ 'area': 1})
+      .explain()['executionStats'])
+#זמן ביצוע עם אינדקס
+# 'executionTimeMillis': 0
+
+executionStats2 = (all_accidents
+      .find({ 'area': '225' })
+      .hint({ '$natural': 1})
+      .explain()['executionStats'])
+#זמן ביצוע ללא אינדקס
+# 'executionTimeMillis': 3
+x = 9
 
 
