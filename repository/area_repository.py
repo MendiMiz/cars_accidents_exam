@@ -45,7 +45,7 @@ def get_incident_by_reason_in_area(area, accidents = all_accidents):
         }
     ]
 
-    print(accidents.aggregate(pipeline))
+    aggregation = accidents.aggregate(pipeline)
 
     result = {
         'area': area,
@@ -55,5 +55,5 @@ def get_incident_by_reason_in_area(area, accidents = all_accidents):
     return result
 
 
-print(get_incident_by_reason_in_area(225))
-print(count_by_area_and_day('225', '2023-09-05'))
+# print(get_incident_by_reason_in_area('225'))
+# print(count_by_area_and_day('225', '2023-09-05'))
