@@ -17,54 +17,58 @@ def init_car_accidents():
    monthly_statistics.drop()
    all_accidents.drop()
 
+   try:
+       for row in read_csv('../data/data.csv'):
+           accident = {
+               'date': parse_date(row['CRASH_DATE']),
+               'area': row['BEAT_OF_OCCURRENCE'],
+               'injuries': {
+                   'total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
+                   'fatal':num_or_zero_if_empty(row['INJURIES_FATAL']),
+                   'non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
+               },
+               'contributing_factor': row['PRIM_CONTRIBUTORY_CAUSE']
+           }
 
-   for row in read_csv('../data/data.csv'):
-       accident = {
-           'date': parse_date(row['CRASH_DATE']),
-           'area': row['BEAT_OF_OCCURRENCE'],
-           'injuries': {
-               'total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
-               'fatal':num_or_zero_if_empty(row['INJURIES_FATAL']),
-               'non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
-           },
-           'contributing_factor': row['PRIM_CONTRIBUTORY_CAUSE']
-       }
-
-       all_accidents.insert_one(accident)
-
-
-       daily_statistics.update_one(
-           {'date': parse_date_only(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
-           {'$inc': {
-               'total_accidents': 1,
-               'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
-               'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
-               'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
-           }},
-           upsert=True
-       )
-
-       weekly_statistics.update_one(
-           {'week_start':  get_week_start(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
-           {'$inc': {
-               'total_accidents': 1,
-               'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
-               'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
-               'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
-           }},
-           upsert=True
-       )
-
-       monthly_statistics.update_one(
-           {'month': get_week_start(row['CRASH_DATE']), 'year': extract_year(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
-           {'$inc': {
-               'total_accidents': 1,
-               'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
-               'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
-               'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
-           }},
-           upsert=True
-       )
+           all_accidents.insert_one(accident)
 
 
-init_car_accidents()
+           daily_statistics.update_one(
+               {'date': parse_date_only(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
+               {'$inc': {
+                   'total_accidents': 1,
+                   'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
+                   'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
+                   'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
+               }},
+               upsert=True
+           )
+
+           weekly_statistics.update_one(
+               {'week_start':  get_week_start(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
+               {'$inc': {
+                   'total_accidents': 1,
+                   'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
+                   'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
+                   'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
+               }},
+               upsert=True
+           )
+
+           monthly_statistics.update_one(
+               {'month': get_week_start(row['CRASH_DATE']), 'year': extract_year(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
+               {'$inc': {
+                   'total_accidents': 1,
+                   'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
+                   'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
+                   'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
+               }},
+               upsert=True
+           )
+       return "db initialized successfully"
+
+   except ValueError:
+       return  "failed to initialize db"
+
+
+# init_car_accidents()
