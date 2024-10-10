@@ -1,6 +1,6 @@
 import csv
 from database.connect import all_accidents, daily_statistics, weekly_statistics, monthly_statistics
-from utils.data_utils import parse_date, extract_year, get_week_start
+from utils.data_utils import parse_date, extract_year, get_week_start, parse_date_only
 from utils.rand_utils import num_or_zero_if_empty
 
 
@@ -34,8 +34,9 @@ def init_car_accidents():
 
 
        daily_statistics.update_one(
-           {'date': parse_date(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
+           {'date': parse_date_only(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
            {'$inc': {
+               'total_accidents': 1,
                'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
                'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
                'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
@@ -46,6 +47,7 @@ def init_car_accidents():
        weekly_statistics.update_one(
            {'week_start':  get_week_start(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
            {'$inc': {
+               'total_accidents': 1,
                'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
                'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
                'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])
@@ -56,6 +58,7 @@ def init_car_accidents():
        monthly_statistics.update_one(
            {'month': get_week_start(row['CRASH_DATE']), 'year': extract_year(row['CRASH_DATE']), 'area': row['BEAT_OF_OCCURRENCE']},
            {'$inc': {
+               'total_accidents': 1,
                'injuries.total': num_or_zero_if_empty(row['INJURIES_TOTAL']),
                'injuries.fatal': num_or_zero_if_empty(row['INJURIES_FATAL']),
                'injuries.non_fatal': num_or_zero_if_empty(row['INJURIES_TOTAL']) - num_or_zero_if_empty(row['INJURIES_FATAL'])

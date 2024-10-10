@@ -6,6 +6,10 @@ def parse_date(date_str: str):
     date_format = '%m/%d/%Y %H:%M:%S %p' if has_seconds else '%m/%d/%Y %H:%M'
     return datetime.strptime(date_str, date_format)
 
+def parse_date_only(date_str: str):
+    only_date = date_str.split(" ")[0]
+    return datetime.strptime(only_date, '%m/%d/%Y')
+
 def extract_year(date_str: str):
     return parse_date(date_str).year
 
@@ -23,5 +27,5 @@ def get_week_range(date_str):
     end_of_week = start_of_week + timedelta(days=6)
     return start_of_week, end_of_week
 
-print(get_week_start('09/22/2023 06:50:00 PM'))
+
 
