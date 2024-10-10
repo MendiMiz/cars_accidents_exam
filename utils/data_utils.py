@@ -24,3 +24,4 @@ def get_week_range(date_str):
     return start_of_week, end_of_week
 
 print(get_week_start('09/22/2023 06:50:00 PM'))
+
